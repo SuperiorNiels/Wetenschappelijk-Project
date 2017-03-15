@@ -22,6 +22,7 @@
  const byte BWD = 1;
  //snelheid
  const byte spd = 128;
+ 
 //code die in het begin wordt uitgevoerd
 void setup() {
   //OUTPUT PINNEN
@@ -34,7 +35,7 @@ void setup() {
   pinMode(bwdButton,INPUT_PULLUP);
   pinMode(lftButton,INPUT_PULLUP);
   pinMode(rgtButton,INPUT_PULLUP);
-  
+  pinMode(stpButton,INPUT_PULLUP);
   //motors testen
   testMotors();
 
@@ -51,7 +52,7 @@ void loop() {
   S = digitalRead(stpButton);
   //zorgt voor de besturing van de robot met behulp van knoppen
   //Er wordt gekeken naar een gelijkenis met 0 omdat er pull up resistoren gebruikt werden
-  if(stpButton==0) {
+  if(S==0) {
     emergencyStop();
   }else if(F==0) {
     forward(spd);
@@ -61,7 +62,7 @@ void loop() {
     left(spd);
   }else if(R==0) {
     right(spd);
-  }else() {
+  }else {
     emergencyStop();
   }
   
