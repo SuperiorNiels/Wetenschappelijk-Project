@@ -10,8 +10,10 @@
 //digitale pinnen
  const byte leftMotors=9;//pwm pinnen
  const byte rightMotors=10;//pwm pinnen
- const byte leftDirection=12;
- const byte rightDirection=13;
+ const byte leftFrontDirection=12;
+ const byte rightFrontDirection=13;
+ const byte leftBackDirection=2;
+ const byte rightBackDirection=3;
  const byte fwdButton=4;
  const byte bwdButton=5;
  const byte lftButton=6;
@@ -21,15 +23,20 @@
  const byte FWD = 0;
  const byte BWD = 1;
  //snelheid
- const byte spd = 128;
+ const byte spd = 50;
+ //digital reads
+  byte F,B,L,R,S;
  
 //code die in het begin wordt uitgevoerd
 void setup() {
-  //OUTPUT PINNEN
+  //OUTPUT PWM PINNEN
   pinMode(leftMotors,OUTPUT);
   pinMode(rightMotors,OUTPUT);
-  pinMode(leftDirection,OUTPUT);
-  pinMode(rightDirection,OUTPUT);
+  //OUTPUT pinnen
+  pinMode(rightFrontDirection,OUTPUT);
+  pinMode(leftBackDirection,OUTPUT);
+  pinMode(leftFrontDirection,OUTPUT);
+  pinMode(rightBackDirection,OUTPUT);
   //INPUT PINNEN
   pinMode(fwdButton,INPUT_PULLUP);
   pinMode(bwdButton,INPUT_PULLUP);
@@ -42,8 +49,7 @@ void setup() {
 }
 //de loop die constant wordt uitgevoerd
 void loop() {
-  //initialisatie variablen
-  byte F,B,L,R,S;
+
   //start van de code
   F = digitalRead(fwdButton);
   B = digitalRead(bwdButton);
@@ -69,10 +75,10 @@ void loop() {
 }
 //functie die de motoren test door de robot links en daarna rechts te doen draaien
 void testMotors() {
-  left(128);
+  left(spd);
   delay(1000);//één seconde wachten
   left(0);
-  right(128);
+  right(spd);
   delay(1000);//één seconde wachten
   right(0);
  
@@ -80,32 +86,40 @@ void testMotors() {
 
 //functie om de robot rechtdoor te doen bewegen
 void forward(byte velocity) {
-  digitalWrite(leftDirection,FWD);
-  digitalWrite(rightDirection,FWD);
+  digitalWrite(leftFrontDirection,0);
+  digitalWrite(rightFrontDirection,0);
+  digitalWrite(leftBackDirection,1);
+  digitalWrite(rightBackDirection,1);
   analogWrite(leftMotors,velocity);
   analogWrite(rightMotors,velocity);
 }
 
 //functie om de robot achteruit te doen bewegen
 void backward(byte velocity) {
-  digitalWrite(leftDirection,BWD);
-  digitalWrite(rightDirection,BWD);
+  digitalWrite(leftFrontDirection,1);
+  digitalWrite(rightFrontDirection,1);
+  digitalWrite(leftBackDirection,0);
+  digitalWrite(rightBackDirection,0);
   analogWrite(leftMotors,velocity);
   analogWrite(rightMotors,velocity);
 }
 
 //functie om de robot links te doen bewegen
 void left(byte velocity) {
-  digitalWrite(leftDirection,BWD);
-  digitalWrite(rightDirection,FWD);
+  digitalWrite(leftFrontDirection,0);
+  digitalWrite(rightFrontDirection,1);
+  digitalWrite(leftBackDirection,1);
+  digitalWrite(rightBackDirection,0);
   analogWrite(leftMotors,velocity);
   analogWrite(rightMotors,velocity);
 }
 
 //functie om de robot rechts te doen bewegen
 void right(byte velocity) {
-  digitalWrite(leftDirection,FWD);
-  digitalWrite(rightDirection,BWD);
+  digitalWrite(leftFrontDirection,1);
+  digitalWrite(rightFrontDirection,0);
+  digitalWrite(leftBackDirection,0);
+  digitalWrite(rightBackDirection,1);
   analogWrite(leftMotors,velocity);
   analogWrite(rightMotors,velocity);
 }
