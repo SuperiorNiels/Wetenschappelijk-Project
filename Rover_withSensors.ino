@@ -68,15 +68,15 @@ void loop() {
   *sensors = readSensors();
   //Rechtelijn
   if(sensors[1] && sensors[3]){
-    forward(128);
+    forward(50);
   }
   //Links
   if(sensors[1] && sensors[2]){
-    left(128);
+    left(50);
   }
   //Rechts
   if(sensors[0] && sensors[1]){
-    right(128);
+    right(50);
   }
   //Eindpunt
   if(sensors[0] && sensors[2] && sensors[3]){
@@ -84,15 +84,15 @@ void loop() {
   }
   //Doodlopend
   if(sensors[3]){
-    left(255);
+    left(50);
   }
   //Afwijking Links
   if(sensors[0]){
-    correctLeft(128);
+    correctLeft(50);
   }
   //Afwijking Rechts
   if(sensors[2]){
-    correctRight(128);
+    correctRight(50);
   }
   
 }
@@ -171,8 +171,8 @@ void correctLeft(byte velocity) {
   digitalWrite(rightFrontDirection,0);
   digitalWrite(leftBackDirection,1);
   digitalWrite(rightBackDirection,1);
-  analogWrite(leftMotors,velocity-50);
-  analogWrite(rightMotors,velocity);
+  analogWrite(leftMotors,velocity);
+  analogWrite(rightMotors,velocity+50);
 }
 //functie om rechtse afwijking op te vangen
 void correctRight(byte velocity) {
@@ -180,8 +180,8 @@ void correctRight(byte velocity) {
   digitalWrite(rightFrontDirection,0);
   digitalWrite(leftBackDirection,1);
   digitalWrite(rightBackDirection,1);
-  analogWrite(leftMotors,velocity);
-  analogWrite(rightMotors,velocity-50);
+  analogWrite(leftMotors,velocity+50);
+  analogWrite(rightMotors,velocity);
 }
 
 //functie om de robot tot stilstand te brengen
