@@ -2,7 +2,8 @@
  *4-Wetenschappelijk project 
  *lijnvolgende robot
  *Eerste test
- *09/03/2017
+ *19/04/2017
+ * Dieter Balemans v2
  */
  
 //initialiatie globale variablen
