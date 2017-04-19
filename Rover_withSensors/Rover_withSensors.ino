@@ -60,42 +60,39 @@ void loop() {
   if(S==0) {
     emergencyStop();
   }
-
-  
-  //start van de code
-
-  //volgende code bepaakt welke actie moet ondernomen worden bij welke sensor stand
-  
-  *sensors = readSensors();
-  //Rechtelijn
-  if(sensors[1] && sensors[3]){
-    forward(spd);
+  else{
+     //start van de code
+     //volgende code bepaakt welke actie moet ondernomen worden bij welke sensor stand
+     *sensors = readSensors();
+     //Rechtelijn
+     if(sensors[1] && sensors[3]){
+       forward(spd);
+     }
+     //Links
+     if(sensors[1] && sensors[2]){
+       left(spd);
+     }
+     //Rechts
+     if(sensors[0] && sensors[1]){
+       right(spd);
+     }
+     //Eindpunt
+     if(sensors[0] && sensors[2] && sensors[3]){
+       emergencyStop();
+     }
+     //Doodlopend
+     if(sensors[3]){
+       left(spd);
+     }
+     //Afwijking Links
+     if(sensors[0]){
+       correctLeft(spd);
+     }
+     //Afwijking Rechts
+     if(sensors[2]){
+       correctRight(spd);
+     }
   }
-  //Links
-  if(sensors[1] && sensors[2]){
-    left(spd);
-  }
-  //Rechts
-  if(sensors[0] && sensors[1]){
-    right(spd);
-  }
-  //Eindpunt
-  if(sensors[0] && sensors[2] && sensors[3]){
-    emergencyStop();
-  }
-  //Doodlopend
-  if(sensors[3]){
-    left(spd);
-  }
-  //Afwijking Links
-  if(sensors[0]){
-    correctLeft(spd);
-  }
-  //Afwijking Rechts
-  if(sensors[2]){
-    correctRight(spd);
-  }
-  
 }
 
 //functie dat de sensors inleest in een array, de mogelijke waarde zijn 1 of 0; een 1 is wit, een 0 is de zwarte lijn
