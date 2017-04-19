@@ -24,10 +24,10 @@
  const byte FWD = 0;
  const byte BWD = 1;
  //snelheid
- const byte spd = 50;
- const byte offset = 50;
+ const byte spd = 60;
+ const byte offset = 20;
  //digital reads
-  byte F,B,L,R,S;
+ byte F,B,L,R,S;
  
 //code die in het begin wordt uitgevoerd
 void setup() {
@@ -69,42 +69,54 @@ void loop() {
      //volgende code bepaakt welke actie moet ondernomen worden bij welke sensor stand
      readSensors(sensors);
      //Rechtelijn
-     if(sensors[1]==1 && sensors[3]==1){
+     if(sensors[0]==0 && sensors[1]==1 && sensors[2]==0 && sensors[3]==1){
        forward(spd);
+       Serial.println("forward");
      }
      //Links
-     if(sensors[1]==1 && sensors[2]==1){
+     if(sensors[0]==0 && sensors[1]==1 && sensors[2]==1 && sensors[3]==0){
        left(spd);
+       Serial.println("links");
      }
      //Rechts
-     if(sensors[0]==1 && sensors[1]==1){
-       right(spd);
+     if(sensors[0]==1 && sensors[1]==1 && sensors[2]==0 && sensors[3]==0){
+       int k = 0;
+       do{
+        right(spd);
+        if(sensors[0]==0 && sensors[1]==1 && sensors[2]==0 && sensors[3]==1){
+          k = 1;
+        }
+       }while(k==0);
+       Serial.println("rechts");
      }
      //Eindpunt
-     if(sensors[0]==1 && sensors[2]==1 && sensors[3]==1){
+     if(sensors[0]==1 && sensors[1]==0 && sensors[2]==1 && sensors[3]==1){
        emergencyStop();
+       Serial.println("end");
      }
      //Doodlopend
-     if(sensors[3]==1){
+     if(sensors[0]==0 && sensors[1]==0 && sensors[2]==0 && sensors[3]==1){
        left(spd);
      }
      //Afwijking Links
-     if(sensors[0]==1){
+     if(sensors[0]==1 && sensors[1]==0 && sensors[2]==0 && sensors[3]==1){
        correctLeft(spd);
+       Serial.println("afwijking L");
      }
      //Afwijking Rechts
-     if(sensors[2]==1){
+     if(sensors[0]==0 && sensors[1]==0 && sensors[2]==1 && sensors[3]==0){
        correctRight(spd);
+       Serial.println("afwijking R");
      }
      else{
        emergencyStop();
      }
   }
-  delay(100);
   Serial.print(sensors[0]);
   Serial.print(sensors[1]);
   Serial.print(sensors[2]);
   Serial.print(sensors[3]);
+  Serial.println();
 }
 
 //functie dat de sensors inleest in een array, de mogelijke waarde zijn 1 of 0; een 0 is wit, een 1 is de zwarte lijn
@@ -149,20 +161,20 @@ void backward(byte velocity) {
 
 //functie om de robot links te doen bewegen
 void left(byte velocity) {
-  digitalWrite(leftFrontDirection,0);
-  digitalWrite(rightFrontDirection,1);
-  digitalWrite(leftBackDirection,1);
-  digitalWrite(rightBackDirection,0);
+  digitalWrite(leftFrontDirection,1);
+  digitalWrite(rightFrontDirection,0);
+  digitalWrite(leftBackDirection,0);
+  digitalWrite(rightBackDirection,1);
   analogWrite(leftMotors,velocity);
   analogWrite(rightMotors,velocity);
 }
 
 //functie om de robot rechts te doen bewegen
 void right(byte velocity) {
-  digitalWrite(leftFrontDirection,1);
-  digitalWrite(rightFrontDirection,0);
-  digitalWrite(leftBackDirection,0);
-  digitalWrite(rightBackDirection,1);
+  digitalWrite(leftFrontDirection,0);
+  digitalWrite(rightFrontDirection,1);
+  digitalWrite(leftBackDirection,1);
+  digitalWrite(rightBackDirection,0);
   analogWrite(leftMotors,velocity);
   analogWrite(rightMotors,velocity);
 }
@@ -191,7 +203,3 @@ void emergencyStop() {
     analogWrite(leftMotors,0);
     analogWrite(rightMotors,0);
 }
-<<<<<<< HEAD
-
-=======
->>>>>>> origin/master
