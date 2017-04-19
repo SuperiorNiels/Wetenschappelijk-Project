@@ -99,18 +99,12 @@ void loop() {
   }
 }
 
-//functie dat de sensors inleest in een array, de mogelijke waarde zijn 1 of 0; een 1 is wit, een 0 is de zwarte lijn
+//functie dat de sensors inleest in een array, de mogelijke waarde zijn 1 of 0; een 0 is wit, een 1 is de zwarte lijn
 //de array heeft vaste plaatsen voor de sensoren: 3=front, 2=left, 1=center, 0=right
 int * readSensors(){
   static int sensor[3];
   sensor[0] = digitalRead(rgtSensor);
-  int temp = digitalRead(cntSensor);
-  if(temp==HIGH){
-    sensor[1] = 0;
-  }
-  else{
-    sensor[1] = 1;
-  }
+  sensor[1] = !digitalRead(cntSensor);
   sensor[2] = digitalRead(lftSensor);
   sensor[3] = digitalRead(frtSensor);
   return sensor;
