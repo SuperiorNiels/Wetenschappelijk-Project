@@ -191,4 +191,7 @@ void emergencyStop() {
     analogWrite(leftMotors,0);
     analogWrite(rightMotors,0);
 }
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/master
