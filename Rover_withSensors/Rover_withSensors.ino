@@ -52,7 +52,7 @@ void setup() {
 //de loop die constant wordt uitgevoerd
 void loop() {
   byte S;
-  int *sensors[3];
+  int sensors[3];
   //start van de code
 
   S = digitalRead(stpButton);
@@ -64,7 +64,7 @@ void loop() {
   else{
      //start van de code
      //volgende code bepaakt welke actie moet ondernomen worden bij welke sensor stand
-     *sensors = readSensors();
+     readSensors(sensors);
      //Rechtelijn
      if(sensors[1]==1 && sensors[3]==1){
        forward(spd);
@@ -101,13 +101,11 @@ void loop() {
 
 //functie dat de sensors inleest in een array, de mogelijke waarde zijn 1 of 0; een 0 is wit, een 1 is de zwarte lijn
 //de array heeft vaste plaatsen voor de sensoren: 3=front, 2=left, 1=center, 0=right
-int * readSensors(){
-  static int sensor[3];
+void readSensors(int*sensor){
   sensor[0] = digitalRead(rgtSensor);
   sensor[1] = !digitalRead(cntSensor);
   sensor[2] = digitalRead(lftSensor);
   sensor[3] = digitalRead(frtSensor);
-  return sensor;
 }
 
 //functie die de motoren test door de robot links en daarna rechts te doen draaien
@@ -185,6 +183,3 @@ void emergencyStop() {
     analogWrite(leftMotors,0);
     analogWrite(rightMotors,0);
 }
-
-
-
