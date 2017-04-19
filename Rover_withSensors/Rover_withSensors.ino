@@ -65,32 +65,35 @@ void loop() {
      //volgende code bepaakt welke actie moet ondernomen worden bij welke sensor stand
      *sensors = readSensors();
      //Rechtelijn
-     if(sensors[1] && sensors[3]){
+     if(sensors[1]==1 && sensors[3]==1){
        forward(spd);
      }
      //Links
-     if(sensors[1] && sensors[2]){
+     if(sensors[1]==1 && sensors[2]==1){
        left(spd);
      }
      //Rechts
-     if(sensors[0] && sensors[1]){
+     if(sensors[0]==1 && sensors[1]==1){
        right(spd);
      }
      //Eindpunt
-     if(sensors[0] && sensors[2] && sensors[3]){
+     if(sensors[0]==1 && sensors[2]==1 && sensors[3]==1){
        emergencyStop();
      }
      //Doodlopend
-     if(sensors[3]){
+     if(sensors[3]==1){
        left(spd);
      }
      //Afwijking Links
-     if(sensors[0]){
+     if(sensors[0]==1){
        correctLeft(spd);
      }
      //Afwijking Rechts
-     if(sensors[2]){
+     if(sensors[2]==1){
        correctRight(spd);
+     }
+     else{
+       emergencyStop();
      }
   }
 }
@@ -187,5 +190,6 @@ void emergencyStop() {
     analogWrite(leftMotors,0);
     analogWrite(rightMotors,0);
 }
+
 
 
