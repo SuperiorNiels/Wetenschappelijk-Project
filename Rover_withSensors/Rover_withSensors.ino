@@ -24,6 +24,7 @@
  const byte BWD = 1;
  //snelheid
  const byte spd = 50;
+ const byte offset = 50;
  //digital reads
   byte F,B,L,R,S;
  
@@ -68,15 +69,15 @@ void loop() {
   *sensors = readSensors();
   //Rechtelijn
   if(sensors[1] && sensors[3]){
-    forward(50);
+    forward(spd);
   }
   //Links
   if(sensors[1] && sensors[2]){
-    left(50);
+    left(spd);
   }
   //Rechts
   if(sensors[0] && sensors[1]){
-    right(50);
+    right(spd);
   }
   //Eindpunt
   if(sensors[0] && sensors[2] && sensors[3]){
@@ -84,15 +85,15 @@ void loop() {
   }
   //Doodlopend
   if(sensors[3]){
-    left(50);
+    left(spd);
   }
   //Afwijking Links
   if(sensors[0]){
-    correctLeft(50);
+    correctLeft(spd);
   }
   //Afwijking Rechts
   if(sensors[2]){
-    correctRight(50);
+    correctRight(spd);
   }
   
 }
@@ -172,7 +173,7 @@ void correctLeft(byte velocity) {
   digitalWrite(leftBackDirection,1);
   digitalWrite(rightBackDirection,1);
   analogWrite(leftMotors,velocity);
-  analogWrite(rightMotors,velocity+50);
+  analogWrite(rightMotors,velocity+offset);
 }
 //functie om rechtse afwijking op te vangen
 void correctRight(byte velocity) {
@@ -180,7 +181,7 @@ void correctRight(byte velocity) {
   digitalWrite(rightFrontDirection,0);
   digitalWrite(leftBackDirection,1);
   digitalWrite(rightBackDirection,1);
-  analogWrite(leftMotors,velocity+50);
+  analogWrite(leftMotors,velocity+offset);
   analogWrite(rightMotors,velocity);
 }
 
