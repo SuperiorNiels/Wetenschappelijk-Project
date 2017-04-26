@@ -25,7 +25,8 @@
  const byte BWD = 1;
  //snelheid
  const byte spd = 60;
- const byte offset = 20;
+ const byte offset = 30;
+ int leave = 0;
  //digital reads
  byte F,B,L,R,S;
  
@@ -68,50 +69,87 @@ void loop() {
      //start van de code
      //volgende code bepaakt welke actie moet ondernomen worden bij welke sensor stand
      readSensors(sensors);
+     
      //Rechtelijn
-     if(sensors[0]==0 && sensors[1]==1 && sensors[2]==0 && sensors[3]==1){
+     if((sensors[0]==0 && sensors[1]==1 && sensors[2]==0 && sensors[3]==1)){
        forward(spd);
        Serial.println("forward");
      }
-     //Links
-     if(sensors[0]==0 && sensors[1]==1 && sensors[2]==1 && sensors[3]==0){
-       left(spd);
-       Serial.println("links");
+     //Naar hoek
+     else if((sensors[0]==0 && sensors[1]==1 && sensors[2]==0 && sensors[3]==0)){
+       forward(spd);
+       Serial.println("naar hoek");
      }
+     
+     //Links
+     else if(sensors[0]==0 && sensors[1]==1 && sensors[2]==1 && sensors[3]==0){
+       do{
+        left(spd);
+        readSensors(sensors);
+        Serial.println("links");
+        if(sensors[3]==1 && sensors[1]==1){  //sensors[0]==0 && sensors[1]==1 && sensors[2]==0
+           leave = 1;
+           Serial.println("LEAVE");
+        }
+       }while(leave == 0);
+       leave = 0;
+       forward(spd);
+     }
+     
      //Rechts
-     if(sensors[0]==1 && sensors[1]==1 && sensors[2]==0 && sensors[3]==0){
-       int k = 0;
+     else if(sensors[0]==1 && sensors[1]==1 && sensors[2]==0 && sensors[3]==0){   
        do{
         right(spd);
-        if(sensors[0]==0 && sensors[1]==1 && sensors[2]==0 && sensors[3]==1){
-          k = 1;
+        readSensors(sensors);
+        Serial.println("rechts");
+        if(sensors[3]==1 && sensors[1]==1){  //sensors[0]==0 && sensors[1]==1 && sensors[2]==0
+           leave = 1;
+           Serial.println("LEAVE");
         }
-       }while(k==0);
-       Serial.println("rechts");
+       }while(leave == 0);
+       leave = 0;
+       forward(spd);
      }
+     
      //Eindpunt
-     if(sensors[0]==1 && sensors[1]==0 && sensors[2]==1 && sensors[3]==1){
+     else if(sensors[0]==1 && sensors[1]==0 && sensors[2]==1 && sensors[3]==1){
        emergencyStop();
        Serial.println("end");
      }
+     
      //Doodlopend
-     if(sensors[0]==0 && sensors[1]==0 && sensors[2]==0 && sensors[3]==1){
-       left(spd);
+     else if(sensors[0]==0 && sensors[1]==0 && sensors[2]==0 && sensors[3]==0){
+       do{
+        left(spd);
+        readSensors(sensors);
+        Serial.println("doodlopend: terugdraaien...");
+        if(sensors[3]==1){  //sensors[0]==0 && sensors[1]==1 && sensors[2]==0
+           leave = 1;
+           Serial.println("LEAVE");
+        }
+       }while(leave == 0);
+       leave = 0;
+       forward(spd);
      }
+     
      //Afwijking Links
-     if(sensors[0]==1 && sensors[1]==0 && sensors[2]==0 && sensors[3]==1){
+     else if((sensors[0]==1 && sensors[1]==1 && sensors[2]==0 && sensors[3]==1) || (sensors[0]==1 && sensors[1]==0 && sensors[2]==0 && sensors[3]==1) || (sensors[0]==0 && sensors[1]==0 && sensors[2]==1 && sensors[3]==0)){
        correctLeft(spd);
        Serial.println("afwijking L");
      }
+     
      //Afwijking Rechts
-     if(sensors[0]==0 && sensors[1]==0 && sensors[2]==1 && sensors[3]==0){
+     else if((sensors[0]==0 && sensors[1]==1 && sensors[2]==1 && sensors[3]==1) || (sensors[0]==0 && sensors[1]==0 && sensors[2]==1 && sensors[3]==1) || (sensors[0]==1 && sensors[1]==0 && sensors[2]==0 && sensors[3]==0)){
        correctRight(spd);
        Serial.println("afwijking R");
      }
+     
      else{
-       emergencyStop();
+       forward(spd);
+       Serial.println("nothing detected go forward");
      }
   }
+
   Serial.print(sensors[0]);
   Serial.print(sensors[1]);
   Serial.print(sensors[2]);
@@ -120,12 +158,12 @@ void loop() {
 }
 
 //functie dat de sensors inleest in een array, de mogelijke waarde zijn 1 of 0; een 0 is wit, een 1 is de zwarte lijn
-//de array heeft vaste plaatsen voor de sensoren: 3=front, 2=left, 1=center, 0=right
+//de array heeft vaste plaatsen voor de sensoren: 0=right, 1=center, 2=left, 3=front.
 void readSensors(int*sensor){
-  sensor[0] = digitalRead(rgtSensor);
-  sensor[1] = !digitalRead(cntSensor);
-  sensor[2] = digitalRead(lftSensor);
   sensor[3] = digitalRead(frtSensor);
+  sensor[2] = digitalRead(lftSensor);
+  sensor[1] = !digitalRead(cntSensor);
+  sensor[0] = digitalRead(rgtSensor);
 }
 
 //functie die de motoren test door de robot links en daarna rechts te doen draaien
