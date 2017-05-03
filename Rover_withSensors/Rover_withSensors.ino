@@ -27,6 +27,7 @@
  const byte spd = 60;
  const byte offset = 30;
  int leave = 0;
+ int stopB = 0;
  //digital reads
  byte F,B,L,R,S;
  
@@ -55,17 +56,10 @@ void setup() {
 }
 //de loop die constant wordt uitgevoerd
 void loop() {
-  byte S;
   int sensors[3];
   //start van de code
-
-  S = digitalRead(stpButton);
-  //zorgt voor de besturing van de robot met behulp van knoppen
-  //Er wordt gekeken naar een gelijkenis met 0 omdat er pull up resistoren gebruikt werden
-  if(S==0) {
-    emergencyStop();
-  }
-  else{
+  checkStopButton();
+  if(stopB==0){
      //start van de code
      //volgende code bepaakt welke actie moet ondernomen worden bij welke sensor stand
      readSensors(sensors);
@@ -77,7 +71,7 @@ void loop() {
      }
      //Naar hoek
      else if((sensors[0]==0 && sensors[1]==1 && sensors[2]==0 && sensors[3]==0)){
-       forward(spd);
+       forward(spd-20);
        Serial.println("naar hoek");
      }
      
@@ -86,14 +80,16 @@ void loop() {
        do{
         left(spd);
         readSensors(sensors);
+        checkStopButton();
         Serial.println("links");
         if(sensors[3]==1 && sensors[1]==1){  //sensors[0]==0 && sensors[1]==1 && sensors[2]==0
            leave = 1;
            Serial.println("LEAVE");
         }
-       }while(leave == 0);
+       }while(leave == 0 && stopB == 0);
        leave = 0;
        forward(spd);
+       delay(1000);
      }
      
      //Rechts
@@ -101,12 +97,13 @@ void loop() {
        do{
         right(spd);
         readSensors(sensors);
+         checkStopButton();
         Serial.println("rechts");
-        if(sensors[3]==1 && sensors[1]==1){  //sensors[0]==0 && sensors[1]==1 && sensors[2]==0
+        if(sensors[0]==1 && sensors[1]==1  && sensors[3]==1){  //sensors[0]==0 && sensors[1]==1 && sensors[2]==0
            leave = 1;
            Serial.println("LEAVE");
         }
-       }while(leave == 0);
+       }while(leave == 0 && stopB == 0);
        leave = 0;
        forward(spd);
      }
@@ -122,12 +119,13 @@ void loop() {
        do{
         left(spd);
         readSensors(sensors);
+        checkStopButton();
         Serial.println("doodlopend: terugdraaien...");
         if(sensors[3]==1){  //sensors[0]==0 && sensors[1]==1 && sensors[2]==0
            leave = 1;
            Serial.println("LEAVE");
         }
-       }while(leave == 0);
+       }while(leave == 0 && stopB == 0);
        leave = 0;
        forward(spd);
      }
@@ -155,6 +153,22 @@ void loop() {
   Serial.print(sensors[2]);
   Serial.print(sensors[3]);
   Serial.println();
+}
+
+//Check Stopbutton
+void checkStopButton(){
+  byte S;
+  S = digitalRead(stpButton);
+  //zorgt voor de besturing van de robot met behulp van knoppen
+  //Er wordt gekeken naar een gelijkenis met 0 omdat er pull up resistoren gebruikt werden
+  if(S == 0){
+    if(stopB == 0) {
+        stopB = 1;
+    }
+    else if(stopB == 1){
+        stopB = 0;
+    }
+  }
 }
 
 //functie dat de sensors inleest in een array, de mogelijke waarde zijn 1 of 0; een 0 is wit, een 1 is de zwarte lijn
