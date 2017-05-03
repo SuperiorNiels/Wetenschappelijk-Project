@@ -27,7 +27,7 @@
  const byte spd = 60;
  const byte offset = 30;
  int leave = 0;
- int stopB = 0;
+ int stopB = 1;
  //digital reads
  byte F,B,L,R,S;
  
@@ -99,7 +99,7 @@ void loop() {
         readSensors(sensors);
          checkStopButton();
         Serial.println("rechts");
-        if(sensors[0]==1 && sensors[1]==1  && sensors[3]==1){  //sensors[0]==0 && sensors[1]==1 && sensors[2]==0
+        if(sensors[1]==1  && sensors[3]==1){  //sensors[0]==0 && sensors[1]==1 && sensors[2]==0
            leave = 1;
            Serial.println("LEAVE");
         }
@@ -146,6 +146,9 @@ void loop() {
        forward(spd);
        Serial.println("nothing detected go forward");
      }
+  }
+  else{
+    emergencyStop();
   }
 
   Serial.print(sensors[0]);
