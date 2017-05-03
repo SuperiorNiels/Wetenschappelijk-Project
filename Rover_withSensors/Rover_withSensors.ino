@@ -162,7 +162,7 @@ void loop() {
 void readSensors(int*sensor){
   sensor[3] = digitalRead(frtSensor);
   sensor[2] = digitalRead(lftSensor);
-  sensor[1] = !digitalRead(cntSensor);
+  sensor[1] = digitalRead(cntSensor);
   sensor[0] = digitalRead(rgtSensor);
 }
 
