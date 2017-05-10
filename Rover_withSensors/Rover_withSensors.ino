@@ -90,8 +90,7 @@ void loop() {
         }
        }while(leave == 0);
        leave = 0;
-       //forward(spd);
-       //delay(1000);
+       forward(spd);
      }
      
      //Rechts
@@ -104,35 +103,8 @@ void loop() {
         Serial.print(sensors[1]);
         Serial.print(sensors[2]);
         Serial.print(sensors[3]);
-        Serial.println();
-       // if(sensors[1]==1  && sensors[3]==1){  
-            /*  do{
-                  if(sensors[0]==0  && sensors[1]==0 && sensors[2]==0  && sensors[3]==0){
-                     right(spd); 
-                      Serial.println("rechts in loop");
-                      Serial.print(sensors[0]);
-                      Serial.print(sensors[1]);
-                      Serial.print(sensors[2]);
-                      Serial.print(sensors[3]);
-                      Serial.println();
-                  }
-                  else{
-                    forward(spd);
-                     Serial.println("forward in loop");
-                     Serial.print(sensors[0]);
-                     Serial.print(sensors[1]);
-                     Serial.print(sensors[2]);
-                     Serial.print(sensors[3]);
-                     Serial.println();
-                  }
-                  if(sensors[0]==0  && sensors[1]==1 && sensors[2]==0  && sensors[3]==1){
-                    leave = 1;
-                  }
-               }while(leave == 0);
-               Serial.println("LEAVE");*/
-           // }         
-            //if(sensors[0]==0  && sensors[1]==1 && sensors[2]==0  && sensors[3]==1){
-            if(sensors[1]==1  && sensors[3]==1){
+        Serial.println();         
+        if(sensors[1]==1  && sensors[3]==1){
                     leave = 1;
                   }
        }while(leave == 0);
