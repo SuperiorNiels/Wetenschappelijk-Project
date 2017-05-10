@@ -1,3 +1,4 @@
+
 /*
  *4-Wetenschappelijk project 
  *lijnvolgende robot
@@ -9,8 +10,8 @@
 //initialiatie globale variablen
 
 //digitale pinnen
- const byte leftMotors=9;//pwm pinnen
- const byte rightMotors=10;//pwm pinnen
+ const byte leftMotors=10;//pwm pinnen
+ const byte rightMotors=9;//pwm pinnen
  const byte leftFrontDirection=12;
  const byte rightFrontDirection=13;
  const byte leftBackDirection=2;
@@ -20,14 +21,11 @@
  const byte lftSensor=6;  //left sensor
  const byte rgtSensor=7;  //right sensor
  const byte stpButton=8;  //stop button
- //directies
- const byte FWD = 0;
- const byte BWD = 1;
  //snelheid
  const byte spd = 60;
  const byte offset = 30;
  int leave = 0;
- int stopB = 1;
+ int stopB = 0;
  //digital reads
  byte F,B,L,R,S;
  
@@ -48,7 +46,7 @@ void setup() {
   pinMode(rgtSensor,INPUT);
   pinMode(stpButton,INPUT_PULLUP);
   //motors testen
-  testMotors();
+ // testMotors();
   
   //Debugging
   Serial.begin(9600);
@@ -58,8 +56,8 @@ void setup() {
 void loop() {
   int sensors[3];
   //start van de code
-  checkStopButton();
-  if(stopB==0){
+  checkStart();
+  if(stopB==1){
      //start van de code
      //volgende code bepaakt welke actie moet ondernomen worden bij welke sensor stand
      readSensors(sensors);
@@ -80,16 +78,20 @@ void loop() {
        do{
         left(spd);
         readSensors(sensors);
-        checkStopButton();
         Serial.println("links");
+        Serial.print(sensors[0]);
+        Serial.print(sensors[1]);
+        Serial.print(sensors[2]);
+        Serial.print(sensors[3]);
+        Serial.println();
         if(sensors[3]==1 && sensors[1]==1){  //sensors[0]==0 && sensors[1]==1 && sensors[2]==0
            leave = 1;
            Serial.println("LEAVE");
         }
-       }while(leave == 0 && stopB == 0);
+       }while(leave == 0);
        leave = 0;
-       forward(spd);
-       delay(1000);
+       //forward(spd);
+       //delay(1000);
      }
      
      //Rechts
@@ -97,13 +99,43 @@ void loop() {
        do{
         right(spd);
         readSensors(sensors);
-         checkStopButton();
         Serial.println("rechts");
-        if(sensors[1]==1  && sensors[3]==1){  //sensors[0]==0 && sensors[1]==1 && sensors[2]==0
-           leave = 1;
-           Serial.println("LEAVE");
-        }
-       }while(leave == 0 && stopB == 0);
+        Serial.print(sensors[0]);
+        Serial.print(sensors[1]);
+        Serial.print(sensors[2]);
+        Serial.print(sensors[3]);
+        Serial.println();
+       // if(sensors[1]==1  && sensors[3]==1){  
+            /*  do{
+                  if(sensors[0]==0  && sensors[1]==0 && sensors[2]==0  && sensors[3]==0){
+                     right(spd); 
+                      Serial.println("rechts in loop");
+                      Serial.print(sensors[0]);
+                      Serial.print(sensors[1]);
+                      Serial.print(sensors[2]);
+                      Serial.print(sensors[3]);
+                      Serial.println();
+                  }
+                  else{
+                    forward(spd);
+                     Serial.println("forward in loop");
+                     Serial.print(sensors[0]);
+                     Serial.print(sensors[1]);
+                     Serial.print(sensors[2]);
+                     Serial.print(sensors[3]);
+                     Serial.println();
+                  }
+                  if(sensors[0]==0  && sensors[1]==1 && sensors[2]==0  && sensors[3]==1){
+                    leave = 1;
+                  }
+               }while(leave == 0);
+               Serial.println("LEAVE");*/
+           // }         
+            //if(sensors[0]==0  && sensors[1]==1 && sensors[2]==0  && sensors[3]==1){
+            if(sensors[1]==1  && sensors[3]==1){
+                    leave = 1;
+                  }
+       }while(leave == 0);
        leave = 0;
        forward(spd);
      }
@@ -119,27 +151,32 @@ void loop() {
        do{
         left(spd);
         readSensors(sensors);
-        checkStopButton();
         Serial.println("doodlopend: terugdraaien...");
+        Serial.print(sensors[0]);
+        Serial.print(sensors[1]);
+        Serial.print(sensors[2]);
+        Serial.print(sensors[3]);
+        Serial.println();
         if(sensors[3]==1){  //sensors[0]==0 && sensors[1]==1 && sensors[2]==0
            leave = 1;
            Serial.println("LEAVE");
         }
-       }while(leave == 0 && stopB == 0);
+       }while(leave == 0);
        leave = 0;
        forward(spd);
      }
      
      //Afwijking Links
-     else if((sensors[0]==1 && sensors[1]==1 && sensors[2]==0 && sensors[3]==1) || (sensors[0]==1 && sensors[1]==0 && sensors[2]==0 && sensors[3]==1) || (sensors[0]==0 && sensors[1]==0 && sensors[2]==1 && sensors[3]==0)){
+    else if (sensors[0]==1 && sensors[1]==0 && sensors[2]==0 && sensors[3]==0){
        correctLeft(spd);
        Serial.println("afwijking L");
-     }
+   }
      
      //Afwijking Rechts
-     else if((sensors[0]==0 && sensors[1]==1 && sensors[2]==1 && sensors[3]==1) || (sensors[0]==0 && sensors[1]==0 && sensors[2]==1 && sensors[3]==1) || (sensors[0]==1 && sensors[1]==0 && sensors[2]==0 && sensors[3]==0)){
+     else if((sensors[0]==0 && sensors[1]==0 && sensors[2]==1 && sensors[3]==0)){
        correctRight(spd);
        Serial.println("afwijking R");
+       
      }
      
      else{
@@ -149,6 +186,7 @@ void loop() {
   }
   else{
     emergencyStop();
+    Serial.println("stopped");
   }
 
   Serial.print(sensors[0]);
@@ -159,18 +197,13 @@ void loop() {
 }
 
 //Check Stopbutton
-void checkStopButton(){
+void checkStart(){
   byte S;
   S = digitalRead(stpButton);
   //zorgt voor de besturing van de robot met behulp van knoppen
   //Er wordt gekeken naar een gelijkenis met 0 omdat er pull up resistoren gebruikt werden
   if(S == 0){
-    if(stopB == 0) {
         stopB = 1;
-    }
-    else if(stopB == 1){
-        stopB = 0;
-    }
   }
 }
 
@@ -240,8 +273,8 @@ void correctLeft(byte velocity) {
   digitalWrite(rightFrontDirection,0);
   digitalWrite(leftBackDirection,1);
   digitalWrite(rightBackDirection,1);
-  analogWrite(leftMotors,velocity);
-  analogWrite(rightMotors,velocity+offset);
+  analogWrite(rightMotors,velocity);
+  analogWrite(leftMotors,velocity+offset);
 }
 //functie om rechtse afwijking op te vangen
 void correctRight(byte velocity) {
@@ -249,8 +282,8 @@ void correctRight(byte velocity) {
   digitalWrite(rightFrontDirection,0);
   digitalWrite(leftBackDirection,1);
   digitalWrite(rightBackDirection,1);
-  analogWrite(leftMotors,velocity+offset);
-  analogWrite(rightMotors,velocity);
+  analogWrite(leftMotors,velocity);
+  analogWrite(rightMotors,velocity+offset);
 }
 
 //functie om de robot tot stilstand te brengen
