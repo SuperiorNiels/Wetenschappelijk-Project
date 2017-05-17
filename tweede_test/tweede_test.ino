@@ -17,7 +17,8 @@
  const byte FWD = 0;
  const byte BWD = 1;
  //snelheid
- const byte spd = 50;
+ const byte spd = 40;
+ const byte offset = 10;
  //digital reads
   byte F,B,L,R,S;
  //encoder ticks
@@ -65,9 +66,17 @@ void loop() {
   Serial.println(tickB);
   Serial.print("rechterkant ");
   Serial.println(tickA);
-
-  while(tickA<520 && tickB<520){
-    right(60);
+  tickA=0;
+  tickB=0;
+  while(tickA<300 && tickB<300){
+    int verschil = tickA-tickB;
+    Serial.println(verschil);
+    if(verschil > 50){
+      correctRight(spd);
+    }
+    else{
+      forward(60);
+    }
   }
   emergencyStop();
 }
@@ -103,4 +112,23 @@ void right(byte velocity) {
   digitalWrite(rightBackDirection,0);
   analogWrite(leftMotors,velocity);
   analogWrite(rightMotors,velocity);
+}
+
+//functie om linkse afwijking op te vangen
+void correctLeft(byte velocity) {
+  digitalWrite(leftFrontDirection,0);
+  digitalWrite(rightFrontDirection,0);
+  digitalWrite(leftBackDirection,1);
+  digitalWrite(rightBackDirection,1);
+  analogWrite(rightMotors,velocity-offset);
+  analogWrite(leftMotors,velocity+offset);
+}
+//functie om rechtse afwijking op te vangen
+void correctRight(byte velocity) {
+  digitalWrite(leftFrontDirection,0);
+  digitalWrite(rightFrontDirection,0);
+  digitalWrite(leftBackDirection,1);
+  digitalWrite(rightBackDirection,1);
+  analogWrite(leftMotors,velocity-offset);
+  analogWrite(rightMotors,velocity+offset);
 }

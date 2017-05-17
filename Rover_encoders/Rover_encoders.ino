@@ -9,11 +9,11 @@
  
 //initialiatie globale variablen
 //interrupt pinnen
- const byte interruptA = 0;//dit is pin 2
- const byte interruptB = 1;//dit is pin 3
+ const byte interruptA = 0; //dit is pin 2
+ const byte interruptB = 1; //dit is pin 3
 //digitale pinnen
- const byte leftMotors=10;//pwm pinnen
- const byte rightMotors=9;//pwm pinnen
+ const byte leftMotors=10; //pwm pinnen
+ const byte rightMotors=9; //pwm pinnen
  const byte leftFrontDirection=12; // Channel 3 motor
  const byte rightFrontDirection=13; //Channel 4 motor
  const byte leftBackDirection=11;// Channel 1 motor
@@ -72,100 +72,108 @@ void setup() {
 void loop() {
   int sensors[3];
   //start van de code
-  //checkStart();
+  checkStart();
   readSensors(sensors);
-  if(stopB==0){
-     //start van de code
-     //volgende code bepaakt welke actie moet ondernomen worden bij welke sensor stand
-     
-     //Rechtelijn
-     if((sensors[0]==0 && sensors[1]==1 && sensors[2]==0 && sensors[3]==1)){
-       forward(spd);
-       readSensors(sensors);
-       //Doodlopend
-        if(sensors[0]==0 && sensors[1]==0 && sensors[2]==0 && sensors[3]==0){
-            do{
-            left(spd);
-            readSensors(sensors);
-            Serial.println("doodlopend: terugdraaien...");
-            Serial.print(sensors[0]);
-            Serial.print(sensors[1]);
-            Serial.print(sensors[2]);
-            Serial.print(sensors[3]);
-            Serial.println();
-            if(sensors[3]==1){  //sensors[0]==0 && sensors[1]==1 && sensors[2]==0
-               leave = 1;
-               Serial.println("LEAVE");
-            }
-         }while(leave == 0);
-         leave = 0;
+  if(stopB==1){
+       //start van de code
+       //volgende code bepaakt welke actie moet ondernomen worden bij welke sensor stand
+       Serial.print("Direction: ");
+       //Rechtelijn
+       if((sensors[0]==0 && sensors[1]==1 && sensors[2]==0 && sensors[3]==1)){
          forward(spd);
-      }
-      Serial.println("forward");
-    }
-    
-     //Links
-     else if(sensors[0]==0 && sensors[1]==1 && sensors[2]==1 && sensors[3]==0){
-          tickA = 0;
-          tickB = 0;
-          while(tickA<520 && tickB<520){
-              left(spd);
-              Serial.println(tickA);
-              Serial.println(tickB);
-          }
-          tickA = 0;
-          tickB = 0;
-          while(tickA<300 && tickB<300){
-              forward(spd);
-              Serial.println(tickA);
-              Serial.println(tickB);
-          }
-          tickA = 0;
-          tickB = 0;
-     }
          
-     //Rechts
-     else if(sensors[0]==1 && sensors[1]==1 && sensors[2]==0 && sensors[3]==0){
-         tickA = 0;
-         tickB = 0;   
-         while(tickA<520 && tickB<520){
-              right(spd);
-              Serial.println(tickA);
-              Serial.println(tickB);
-         }
-         tickA = 0;
-         tickB = 0;
-         while(tickA<300 && tickB<300){
-             forward(spd);
-             Serial.println(tickA);
-             Serial.println(tickB);
-         }
-         tickA = 0;
-         tickB = 0;  
-     }
-     
-     //Eindpunt
-     else if(sensors[0]==1 && sensors[1]==0 && sensors[2]==1 && sensors[3]==1){
-       emergencyStop();
-       Serial.println("end");
-     }
-     
-     
-     
-    //Afwijking Links
-     else if (sensors[0]==1 && sensors[1]==0 && sensors[2]==0 && sensors[3]==0 || sensors[0]==1 && sensors[1]==1 && sensors[2]==0 && sensors[3]==1){
-       correctLeft(spd);
-       Serial.println("afwijking L");
-    }
-     
-     //Afwijking Rechts
-      else if((sensors[0]==0 && sensors[1]==0 && sensors[2]==1 && sensors[3]==0 || sensors[0]==0 && sensors[1]==1 && sensors[2]==1 && sensors[3]==1)){
-       correctRight(spd);
-       Serial.println("afwijking R");
-       
-     }
-     
-     else{
+         readSensors(sensors);
+         
+         //Doodlopend
+          if(sensors[0]==0 && sensors[1]==0 && sensors[2]==0 && sensors[3]==0){
+              do{
+              left(spd);
+              readSensors(sensors);
+              Serial.println("doodlopend: terugdraaien...");
+              Serial.print(sensors[0]);
+              Serial.print(sensors[1]);
+              Serial.print(sensors[2]);
+              Serial.print(sensors[3]);
+              Serial.println();
+              if(sensors[3]==1){  //sensors[0]==0 && sensors[1]==1 && sensors[2]==0
+                 leave = 1;
+                 Serial.println("LEAVE");
+              }
+           }while(leave == 0);
+           leave = 0;
+           forward(spd);
+        }      
+        Serial.println("forward");
+      }
+      
+      //Links
+      else if(sensors[0]==0 && sensors[1]==0 && sensors[2]==0 && sensors[3]==1){
+             tickA = 0;
+             tickB = 0;
+             while(tickA<540 && tickB<540){
+                 left(spd);
+                 Serial.println(tickA);
+                 Serial.println(tickB);
+             }
+             tickA = 0;
+             tickB = 0;
+             while(tickA<300 && tickB<300){
+                 forward(spd);
+                 Serial.println(tickA);
+                 Serial.println(tickB);
+             }
+             tickA = 0;
+             tickB = 0;
+             leave = 1;
+       }
+               
+       //Rechts
+       else if(sensors[0]==1 && sensors[1]==0 && sensors[2]==1 && sensors[3]==0){
+             tickA = 0;
+             tickB = 0;
+			 while(tickA<220 && tickB<220){
+                 forward(spd);
+                 Serial.println(tickA);
+                 Serial.println(tickB);
+             }
+			 tickA = 0;
+             tickB = 0;			 
+             while(tickA<520 && tickB<520){
+                 right(spd);
+                 Serial.println(tickA);
+                 Serial.println(tickB);
+             }
+             tickA = 0;
+             tickB = 0;
+             while(tickA<300 && tickB<300){
+                 forward(spd);
+                 Serial.println(tickA);
+                 Serial.println(tickB);
+             }
+             tickA = 0;
+             tickB = 0;
+             leave = 1;  
+       }
+  
+        //Afwijking Links
+        else if(sensors[0]==1 && sensors[1]==0 && sensors[2]==0 && sensors[3]==0 || sensors[0]==1 && sensors[1]==1 && sensors[2]==0 && sensors[3]==1 || sensors[0]==1 && sensors[1]==1 && sensors[2]==0 && sensors[3]==0){
+           correctLeft(spd);
+           Serial.println("afwijking L");
+       }
+         
+       //Afwijking Rechts
+       else if(sensors[0]==0 && sensors[1]==0 && sensors[2]==1 && sensors[3]==0 || sensors[0]==0 && sensors[1]==1 && sensors[2]==1 && sensors[3]==1 || sensors[0]==0 && sensors[1]==1 && sensors[2]==1 && sensors[3]==0){
+           correctRight(spd);
+           Serial.println("afwijking R");    
+       } 
+        
+       //Eindpunt
+       else if(sensors[0]==1 && sensors[1]==0 && sensors[2]==1 && sensors[3]==1){
+         emergencyStop();
+         Serial.println("end");
+       }
+   
+    else{
        forward(spd);
        Serial.println("nothing detected go forward");
      }
@@ -188,7 +196,7 @@ void checkStart(){
   S = analogRead(stpButton);
   //zorgt voor de besturing van de robot met behulp van knoppen
   //Er wordt gekeken naar een gelijkenis met 0 omdat er pull up resistoren gebruikt werden
-  if(S == 0 ){
+  if(S < 50){
         stopB = 1;
   }
 }
