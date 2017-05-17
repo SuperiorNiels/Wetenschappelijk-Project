@@ -68,30 +68,75 @@ void loop() {
      }
      //Naar hoek
      else if((sensors[0]==0 && sensors[1]==1 && sensors[2]==0 && sensors[3]==0)){
-       forward(spd-20);
-       Serial.println("naar hoek");
+		  do{
+		  forward(spd-20);
+		  readSensors();
+		  Serial.println("naar hoek");
+			  //Links
+			  if(sensors[0]==0 && sensors[1]==1 && sensors[2]==1 && sensors[3]==0){
+			   do{
+				left(spd);
+				readSensors(sensors);
+				Serial.println("links");
+				Serial.print(sensors[0]);
+				Serial.print(sensors[1]);
+				Serial.print(sensors[2]);
+				Serial.print(sensors[3]);
+				Serial.println();
+				if(sensors[3]==1){  //Eindvoorwaarde front sensor aan
+				   leave = 1;
+				   Serial.println("LEAVE");
+				}
+			   }while(leave == 0);
+			 }
+			 
+		  //Rechts
+		  if(sensors[0]==1 && sensors[1]==1 && sensors[2]==0 && sensors[3]==0){   
+		   do{
+			right(spd);
+			readSensors(sensors);
+			Serial.println("rechts");
+			Serial.print(sensors[0]);
+			Serial.print(sensors[1]);
+			Serial.print(sensors[2]);
+			Serial.print(sensors[3]);
+			Serial.println();
+		   if(sensors[1]==1  && sensors[3]==1){  
+				do{
+					  if(sensors[0]==0  && sensors[1]==0 && sensors[2]==0  && sensors[3]==0){
+						 right(spd); 
+						  Serial.println("rechts in loop");
+						  Serial.print(sensors[0]);
+						  Serial.print(sensors[1]);
+						  Serial.print(sensors[2]);
+						  Serial.print(sensors[3]);
+						  Serial.println();
+					  }
+					  else{
+						forward(spd);
+						 Serial.println("forward in loop");
+						 Serial.print(sensors[0]);
+						 Serial.print(sensors[1]);
+						 Serial.print(sensors[2]);
+						 Serial.print(sensors[3]);
+						 Serial.println();
+					  }
+					  if(sensors[0]==0  && sensors[1]==1 && sensors[2]==0  && sensors[3]==1){
+						leave = 1;
+					  }
+				   }while(leave == 0);
+				   Serial.println("LEAVE");
+				}         
+				//if(sensors[0]==0  && sensors[1]==1 && sensors[2]==0  && sensors[3]==1){
+				if(sensors[1]==1  && sensors[3]==1){
+						leave = 1;
+				}
+		   }while(leave == 0);
+			 
+			 
+		  }while(leave == 0); leave = 0;
      }
-     
-     //Links
-     else if(sensors[0]==0 && sensors[1]==1 && sensors[2]==1 && sensors[3]==0){
-       do{
-        left(spd);
-        readSensors(sensors);
-        Serial.println("links");
-        Serial.print(sensors[0]);
-        Serial.print(sensors[1]);
-        Serial.print(sensors[2]);
-        Serial.print(sensors[3]);
-        Serial.println();
-        if(sensors[3]==1 && sensors[1]==1){  //sensors[0]==0 && sensors[1]==1 && sensors[2]==0
-           leave = 1;
-           Serial.println("LEAVE");
-        }
-       }while(leave == 0);
-       leave = 0;
-       //forward(spd);
-       //delay(1000);
-     }
+
      
      //Rechts
      else if(sensors[0]==1 && sensors[1]==1 && sensors[2]==0 && sensors[3]==0){   

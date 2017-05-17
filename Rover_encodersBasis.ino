@@ -25,7 +25,7 @@
  const byte stpButton=A0;  //stop button
 //snelheid
  const byte spd = 60;
- const byte offset = 45;
+ const byte offset = 30;
  int leave = 0;
  int stopB = 0;
 //digital reads
@@ -83,7 +83,28 @@ void loop() {
      if((sensors[0]==0 && sensors[1]==1 && sensors[2]==0 && sensors[3]==1)){
          forward(spd);      
          Serial.println("forward");
-     }   
+     }
+      
+	 //Doodlopend
+     else if(sensors[0]==0 && sensors[1]==0 && sensors[2]==0 && sensors[3]==0){
+             tickA = 0;
+             tickB = 0;
+             while(tickA<1080 && tickB<1080){ // eventueel nog met front sensor aan implementeren 
+                 right(spd);
+                 Serial.println(tickA);
+                 Serial.println(tickB);
+             }
+             tickA = 0;
+             tickB = 0;
+             while(tickA<50&& tickB<50){
+                 forward(spd);
+                 Serial.println(tickA);
+                 Serial.println(tickB);
+             }
+             tickA = 0;
+             tickB = 0;
+             leave = 0;
+      }      
 	  
       //Links
       else if(sensors[0]==0 && sensors[1]==0 && sensors[2]==0 && sensors[3]==1){
@@ -103,40 +124,9 @@ void loop() {
              }
 			rightTurn(); 
        }
-	   
-	   //T-splitsing R
-	   else if(sensors[0]==1 && sensors[1]==0 && sensors[2]==0 && sensors[3]==1){
-		   Serial.println("T-splitsing R");    //Het algoritme dat we hier gebruiken is wallfolower dit doet de robot rechts draaien telkens wanneer hij kan.
-		   rightTurn();
-	   }
-	   
-	   //T-splitsing L
-	   else if(sensors[0]==0 && sensors[1]==0 && sensors[2]==1 && sensors[3]==1){
-		   Serial.println("T-splitsing L");
-		   forward(spd);
-	   }
-	   
-	   //T-splitsing C
-	   else if(sensors[0]==1 && sensors[1]==0 && sensors[2]==1 && sensors[3]==1){
-		   Serial.println("T-splitsing C");		//Het algoritme dat we hier gebruiken is wallfolower dit doet de robot rechts draaien telkens wanneer hij kan.
-		   rightTurn();
-	   }
-	   
-	   //Kruispunt
-	   else if(sensors[0]==1 && sensors[1]==1 && sensors[2]==1 && sensors[3]==1){
-		   Serial.println("Kruispunt");
-		   tickA = 0;
-           tickB = 0;
-		   while(tickA<50 && tickB<50){
-               forward(spd);
-               Serial.println(tickA);
-               Serial.println(tickB);
-           }
-		   rightTurn(); 		//Het algoritme dat we hier gebruiken is wallfolower dit doet de robot rechts draaien telkens wanneer hij kan.
-	   }						//Dus op een kruispunt draait hij rechts.
   
-       //Afwijking Links
-       else if(sensors[0]==1 && sensors[1]==0 && sensors[2]==0 && sensors[3]==0 || sensors[0]==1 && sensors[1]==1 && sensors[2]==0 && sensors[3]==1 || sensors[0]==1 && sensors[1]==1 && sensors[2]==0 && sensors[3]==0){
+        //Afwijking Links
+        else if(sensors[0]==1 && sensors[1]==0 && sensors[2]==0 && sensors[3]==0 || sensors[0]==1 && sensors[1]==1 && sensors[2]==0 && sensors[3]==1 || sensors[0]==1 && sensors[1]==1 && sensors[2]==0 && sensors[3]==0){
            correctLeft(spd);
            Serial.println("afwijking L");
        }
@@ -146,27 +136,6 @@ void loop() {
            correctRight(spd);
            Serial.println("afwijking R");    
        } 
-	   
-	   //Doodlopend
-       else if(sensors[0]==0 && sensors[1]==0 && sensors[2]==0 && sensors[3]==0){
-             tickA = 0;
-             tickB = 0;
-             while(tickA<1060 && tickB<1060){ // eventueel nog met front sensor aan implementeren 
-                 right(spd);
-                 Serial.println(tickA);
-                 Serial.println(tickB);
-             }
-             tickA = 0;
-             tickB = 0;
-             while(tickA<50&& tickB<50){
-                 forward(spd);
-                 Serial.println(tickA);
-                 Serial.println(tickB);
-             }
-             tickA = 0;
-             tickB = 0;
-             leave = 0;
-      } 
         
        //Eindpunt
        else if(sensors[0]==1 && sensors[1]==0 && sensors[2]==1 && sensors[3]==1){
@@ -223,7 +192,7 @@ void rightTurn(){
     }
     tickA = 0;
     tickB = 0;
-    while(tickA<100 && tickB<100){
+    while(tickA<300 && tickB<300){
         forward(spd);
         Serial.println(tickA);
         Serial.println(tickB);
