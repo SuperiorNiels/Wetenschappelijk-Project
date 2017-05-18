@@ -83,7 +83,7 @@ void loop() {
 					Serial.print(sensors[2]);
 					Serial.print(sensors[3]);
 					Serial.println();
-					if(sensors[0]==0 && sensors[1]==1 && sensors[2]==0 && sensors[3]==1){  //Eindvoorwaarde forward
+					if(sensors[3]==1){  //Eindvoorwaarde front aan
 					leave = 1;
 					Serial.println("LEAVE");
 				}
@@ -101,7 +101,7 @@ void loop() {
 					Serial.print(sensors[2]);
 					Serial.print(sensors[3]);
 					Serial.println();
-					if(sensors[0]==0 && sensors[1]==1 && sensors[2]==0 && sensors[3]==1){  //Eindvoorwaarde forward
+					if(sensors[3]==1){  //Eindvoorwaarde fornt aan
 					leave = 1;
 					Serial.println("LEAVE");
 					}		

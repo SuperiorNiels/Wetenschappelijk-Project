@@ -1,3 +1,4 @@
+
 /*
  *4-Wetenschappelijk project 
  *lijnvolgende robot
@@ -7,26 +8,29 @@
  */
  
 //initialiatie globale variablen
-
+//interrupt pinnen
+ const byte interruptA = 0;//dit is pin 2
+ const byte interruptB = 1;//dit is pin 3
 //digitale pinnen
  const byte leftMotors=10;//pwm pinnen
  const byte rightMotors=9;//pwm pinnen
- const byte leftFrontDirection=12;
- const byte rightFrontDirection=13;
- const byte leftBackDirection=2;
- const byte rightBackDirection=3;
+ const byte leftFrontDirection=12; // Channel 3 motor
+ const byte rightFrontDirection=13; //Channel 4 motor
+ const byte leftBackDirection=11;// Channel 1 motor
+ const byte rightBackDirection=8; // Channel 2 motor
  const byte frtSensor=4;  //front sensor
  const byte cntSensor=5;  //center sensor
  const byte lftSensor=6;  //left sensor
  const byte rgtSensor=7;  //right sensor
- const byte stpButton=8;  //stop button
- //snelheid
+ const byte stpButton=A0;  //stop button
+//snelheid
  const byte spd = 60;
  const byte offset = 30;
  int leave = 0;
  int stopB = 0;
- //digital reads
- byte F,B,L,R,S;
+//digital reads
+ byte S;
+
  
 //code die in het begin wordt uitgevoerd
 void setup() {
@@ -43,9 +47,10 @@ void setup() {
   pinMode(cntSensor,INPUT);
   pinMode(lftSensor,INPUT);
   pinMode(rgtSensor,INPUT);
-  pinMode(stpButton,INPUT_PULLUP);
-  //motors testen
- // testMotors();
+  pinMode(stpButton,INPUT);
+  //interrupts attachment
+  attachInterrupt (interruptA, isrA, CHANGE);   
+  attachInterrupt (interruptB, isrB, CHANGE);  
   
   //Debugging
   Serial.begin(9600);
@@ -54,60 +59,30 @@ void setup() {
 //de loop die constant wordt uitgevoerd
 void loop() {
   int sensors[3];
-  //start van de code  
-  checkStart();
-  if(stopB==1){
+  //start van de code
+  //checkStart();
+  readSensors(sensors);
+  if(stopB==0){
      //start van de code
      //volgende code bepaakt welke actie moet ondernomen worden bij welke sensor stand
-     readSensors(sensors);
      
      //Rechtelijn
      if((sensors[0]==0 && sensors[1]==1 && sensors[2]==0 && sensors[3]==1)){
        forward(spd);
+       readSensors(sensors);
+       //Doodlopend
+       
        Serial.println("forward");
      }
-     //Naar hoek
-     else if((sensors[0]==0 && sensors[1]==1 && sensors[2]==0 && sensors[3]==0)){
-		  do{
-		  forward(spd-20);
-		  readSensors();
-		  Serial.println("naar hoek");
-			  //Links
-			  if(sensors[0]==0 && sensors[1]==1 && sensors[2]==1 && sensors[3]==0){
-			   do{
-					left(spd);
-					readSensors(sensors);
-					Serial.println("links");
-					Serial.print(sensors[0]);
-					Serial.print(sensors[1]);
-					Serial.print(sensors[2]);
-					Serial.print(sensors[3]);
-					Serial.println();
-					if(sensors[0]==0 && sensors[1]==1 && sensors[2]==0 && sensors[3]==1){  //Eindvoorwaarde forward
-					leave = 1;
-					Serial.println("LEAVE");
-				}
-			   }while(leave == 0);
-			 }
-			 
-			//Rechts
-			if(sensors[0]==1 && sensors[1]==1 && sensors[2]==0 && sensors[3]==0){   
-				do{
-					right(spd);
-					readSensors(sensors);
-					Serial.println("links");
-					Serial.print(sensors[0]);
-					Serial.print(sensors[1]);
-					Serial.print(sensors[2]);
-					Serial.print(sensors[3]);
-					Serial.println();
-					if(sensors[0]==0 && sensors[1]==1 && sensors[2]==0 && sensors[3]==1){  //Eindvoorwaarde forward
-					leave = 1;
-					Serial.println("LEAVE");
-					}		
-			   }while(leave == 0);
-			 }
-		   }while(leave == 0); leave = 0;	 
+	  
+     //Links
+     else if(sensors[0]==0 && sensors[1]==1 && sensors[2]==1 && sensors[3]==0){
+        left(spd);
+      }
+         
+     //Rechts
+     else if(sensors[0]==1 && sensors[1]==1 && sensors[2]==0 && sensors[3]==0){   
+        right(spd);
      }
      
      //Eindpunt
@@ -116,41 +91,25 @@ void loop() {
        Serial.println("end");
      }
      
-     //Doodlopend
-     else if(sensors[0]==0 && sensors[1]==0 && sensors[2]==0 && sensors[3]==0){
-       do{
-        left(spd);
-        readSensors(sensors);
-        Serial.println("doodlopend: terugdraaien...");
-        Serial.print(sensors[0]);
-        Serial.print(sensors[1]);
-        Serial.print(sensors[2]);
-        Serial.print(sensors[3]);
-        Serial.println();
-        if(sensors[3]==1){  //sensors[0]==0 && sensors[1]==1 && sensors[2]==0
-           leave = 1;
-           Serial.println("LEAVE");
-        }
-       }while(leave == 0);
-       leave = 0;
-       forward(spd);
-     }
+     
      
      //Afwijking Links
     else if (sensors[0]==1 && sensors[1]==0 && sensors[2]==0 && sensors[3]==0){
-       correctLeft(spd);
+       //correctLeft(spd);
+       emergencyStop();
        Serial.println("afwijking L");
    }
      
      //Afwijking Rechts
      else if((sensors[0]==0 && sensors[1]==0 && sensors[2]==1 && sensors[3]==0)){
-       correctRight(spd);
+       //correctRight(spd);
+       emergencyStop();
        Serial.println("afwijking R");
        
      }
      
      else{
-       forward(spd);
+       emergencyStop();
        Serial.println("nothing detected go forward");
      }
   }
@@ -169,10 +128,12 @@ void loop() {
 //Check Stopbutton
 void checkStart(){
   byte S;
-  S = digitalRead(stpButton);
+  S = analogRead(stpButton);
   //zorgt voor de besturing van de robot met behulp van knoppen
   //Er wordt gekeken naar een gelijkenis met 0 omdat er pull up resistoren gebruikt werden
-  if(S == 0){
+  Serial.print("Stopb= ");
+  Serial.println(S);
+  if(S < 50){
         stopB = 1;
   }
 }
@@ -243,7 +204,7 @@ void correctLeft(byte velocity) {
   digitalWrite(rightFrontDirection,0);
   digitalWrite(leftBackDirection,1);
   digitalWrite(rightBackDirection,1);
-  analogWrite(rightMotors,velocity);
+  analogWrite(rightMotors,velocity-offset);
   analogWrite(leftMotors,velocity+offset);
 }
 //functie om rechtse afwijking op te vangen
@@ -252,7 +213,7 @@ void correctRight(byte velocity) {
   digitalWrite(rightFrontDirection,0);
   digitalWrite(leftBackDirection,1);
   digitalWrite(rightBackDirection,1);
-  analogWrite(leftMotors,velocity);
+  analogWrite(leftMotors,velocity-offset);
   analogWrite(rightMotors,velocity+offset);
 }
 
