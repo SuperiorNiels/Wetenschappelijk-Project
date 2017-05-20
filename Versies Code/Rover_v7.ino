@@ -24,7 +24,7 @@ const byte stpButton=A0;  //stop button
 //snelheid
 const byte spd = 60;
 const byte offset = 45;
-int stopB = 0;
+int startB = 0;
 //digital reads
 byte S;
 //encoder ticks
@@ -62,14 +62,13 @@ void setup() {
 	attachInterrupt (interruptB, isrB, CHANGE);
 	//DEBUGGING
 	Serial.begin(9600);
-
 }
 //de loop die constant wordt uitgevoerd
 void loop() {
 	int sensors[3]; //Array dat de sensor standen bevat
-	checkStart(); 	//Functie dat nakijkt of de start knop is ingedrukt. Ingedrukt => stopB=1. Stoppen is met de reset knop van de arduino
+	checkStart(); 	//Functie dat nakijkt of de start knop is ingedrukt. Ingedrukt => startB=1. Stoppen is met de reset knop van de arduino
 	readSensors(sensors);	//Functie die de sensorstanden inleest
-	if(stopB==1){
+	if(startB==1){
 		//volgende code bepaakt welke actie moet ondernomen worden bij welke sensor stand
 		Serial.print("Direction: ");
 		readSensors(sensors);	//Functie die de sensorstanden inleest
@@ -225,7 +224,7 @@ void rightTurn(){
 	tickB = 0;
 }
 
-//Check S
+//Check Startbutton
 void checkStart(){
 	byte S;
 	S = analogRead(stpButton);
@@ -233,7 +232,7 @@ void checkStart(){
 	//We nemen onder 50 omdat de er gebruik gemaakt wordt van een pull up schakel systeem. Wanneer de knop ingedrukt wordt zal de waarde naar 0 gaan
 	//Niet ingedrukt is hogere spanning op de input
 	if(S < 50){
-		stopB = 1;
+		startB = 1;
 	}
 }
 
