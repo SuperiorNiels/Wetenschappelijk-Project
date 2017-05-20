@@ -128,7 +128,8 @@ void loop() {
 				Serial.println(tickB);
 			}
 			rightTurn(); 		
-
+		}
+		
 		//Eindpunt
 		else if(sensors[0]==1 && sensors[1]==1 && sensors[2]==1 && sensors[3]==0){
 			emergencyStop();
