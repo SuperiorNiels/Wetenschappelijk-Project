@@ -25,7 +25,7 @@
  const byte stpButton=A0;  //stop button
 //snelheid
  const byte spd = 60;
- const byte offset = 45;
+ const byte offset = 35;
  int leave = 0;
  int stopB = 0;
 //digital reads
@@ -179,7 +179,7 @@ void loop() {
       } 
         
        //Eindpunt
-       else if(sensors[0]==1 && sensors[1]==0 && sensors[2]==1 && sensors[3]==1){
+       else if(sensors[0]==1 && sensors[1]==1 && sensors[2]==1 && sensors[3]==0){
          emergencyStop();
          Serial.println("end");
        }
@@ -205,7 +205,7 @@ void loop() {
 void leftTurn(){
 	tickA = 0;
     tickB = 0;
-    while(tickA<540 && tickB<540){
+    while(tickA<530 && tickB<530){
         left(spd);
         Serial.println(tickA);
         Serial.println(tickB);
@@ -226,7 +226,7 @@ void leftTurn(){
 void rightTurn(){
 	tickA = 0;
     tickB = 0;
-    while(tickA<540 && tickB<540){
+    while(tickA<530 && tickB<530){
         right(spd);
         Serial.println(tickA);
         Serial.println(tickB);
